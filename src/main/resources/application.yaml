@@ -1,8 +1,11 @@
 spring:
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
   config:
     import: "optional:file:.env[.properties]"
   application:
-    name: chomoi
+    name: short_term_course
   datasource:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
@@ -30,6 +33,9 @@ spring:
           auth: true
           starttls:
             enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
   security:
     oauth2:
       client:
@@ -67,5 +73,14 @@ app:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
   clientReceiveTokensPath: ${CLIENT_RECEIVE_TOKENS_PATH}
+  cloudinary:
+    cloud:
+      name: ${CLOUDINARY_NAME}
+    api:
+      key: ${CLOUDINARY_API_KEY}
+      secret: ${CLOUDINARY_API_SECRET}
+    folder: ${CLOUDINARY_FOLDER}
 server:
   port: ${PORT}
+  servlet:
+    context-path: /short-term-course

@@ -8,11 +8,11 @@
 		<version>3.3.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.ecommerce</groupId>
-	<artifactId>chomoi</artifactId>
+	<groupId>com.short_term_course</groupId>
+	<artifactId>short_term_course</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>chomoi</name>
-	<description>Supper ecommerce</description>
+	<name>short_term_course</name>
+	<description>short_term_course</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -51,6 +51,14 @@
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!-- CLoudinary -->
+		<!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-core -->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>1.29.0</version>
 		</dependency>
 
 		<!-- Lombok (Giảm boilerplate code như getter/setter) -->
@@ -156,6 +164,8 @@
 					<arg>-Amapstruct.suppressGeneratorTimestamp=true</arg>
 					<arg>-Amapstruct.defaultComponentModel=spring</arg>
 					<arg>-Amapstruct.verbose=true</arg>
+					<!-- bật lưu tên tham số -->
+					<arg>-parameters</arg>
 				</compilerArgs>
 			</configuration>
 		</plugin>
