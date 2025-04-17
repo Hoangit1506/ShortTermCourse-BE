@@ -99,7 +99,7 @@ public class LecturerServiceImpl implements LecturerService {
 
         Account acc = mapper.toAccount(dto);
         acc.setPassword(passwordUtil.encodePassword(dto.getPassword()));
-        acc.setRoles(Set.of(Role.LECTURER));
+        acc.setRoles(Set.of(Role.LECTURER, Role.USER));
         accountRepo.save(acc);
 
         // profile có specializations luôn được khởi tạo

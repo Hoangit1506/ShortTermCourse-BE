@@ -160,7 +160,7 @@
 						<version>${lombok-mapstruct-binding.version}</version>
 					</path>
 				</annotationProcessorPaths>
-				<compilerArgs>
+				<compilerArgs>--enable-preview
 					<arg>-Amapstruct.suppressGeneratorTimestamp=true</arg>
 					<arg>-Amapstruct.defaultComponentModel=spring</arg>
 					<arg>-Amapstruct.verbose=true</arg>

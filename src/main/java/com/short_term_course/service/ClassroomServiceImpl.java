@@ -15,9 +15,16 @@ import com.short_term_course.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +108,20 @@ public class ClassroomServiceImpl implements ClassroomService {
                 .totalPages(dtos.getTotalPages())
                 .last(dtos.isLast())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponse<ClassroomDto> filterOpenCourses(String categoryId, String startDate, String endDate, Pageable pageable) {
+        LocalDate start = (startDate == null || startDate.isBlank()) ? null : LocalDate.parse(startDate);
+        LocalDate end = (endDate == null || endDate.isBlank()) ? null : LocalDate.parse(endDate);
+
+        Page<Classroom> page = classroomRepo.filterOpenCourses(categoryId, start, end, pageable);
+
+        List<ClassroomDto> dtoList = page.getContent().stream()
+                .map(mapper::toDto)
+                .toList();
+
+        return new PagedResponse<>(dtoList, pageable, page.getTotalElements());
     }
 }

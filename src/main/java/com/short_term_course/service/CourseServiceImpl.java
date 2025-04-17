@@ -21,16 +21,55 @@ public class CourseServiceImpl implements CourseService {
     private final CategoryRepository categoryRepo;
     private final CourseMapper mapper;
 
+//    @Override
+//    public PagedResponse<CourseDto> list(String categoryId, String keyword, Pageable pageable) {
+//        Page<Course> page;
+//        if (categoryId != null) {
+//            page = courseRepo.findByCategoryId(categoryId, pageable);
+//        } else if (keyword != null) {
+//            page = courseRepo.findByNameContainingIgnoreCase(keyword, pageable);
+//        } else {
+//            page = courseRepo.findAll(pageable);
+//        }
+//        List<CourseDto> dtos = page.stream()
+//                .map(mapper::toDto)
+//                .collect(Collectors.toList());
+//
+//        return PagedResponse.<CourseDto>builder()
+//                .content(dtos)
+//                .pageNumber(page.getNumber())
+//                .pageSize(page.getSize())
+//                .totalElements(page.getTotalElements())
+//                .totalPages(page.getTotalPages())
+//                .last(page.isLast())
+//                .build();
+//    }
+
     @Override
     public PagedResponse<CourseDto> list(String categoryId, String keyword, Pageable pageable) {
         Page<Course> page;
-        if (categoryId != null) {
+
+        boolean hasCat = categoryId != null && !categoryId.isBlank();
+        boolean hasKw  = keyword    != null && !keyword.isBlank();
+
+        if (hasCat && hasKw) {
+            // cả keyword + category
+            page = courseRepo
+                    .findByNameContainingIgnoreCaseAndCategoryId(keyword, categoryId, pageable);
+
+        } else if (hasCat) {
+            // chỉ filter theo chuyên ngành
             page = courseRepo.findByCategoryId(categoryId, pageable);
-        } else if (keyword != null) {
+
+        } else if (hasKw) {
+            // chỉ filter theo từ khóa tên
             page = courseRepo.findByNameContainingIgnoreCase(keyword, pageable);
+
         } else {
+            // không có điều kiện filter
             page = courseRepo.findAll(pageable);
         }
+
         List<CourseDto> dtos = page.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
@@ -44,6 +83,7 @@ public class CourseServiceImpl implements CourseService {
                 .last(page.isLast())
                 .build();
     }
+
 
     @Override
     public CourseDto getById(String id) {

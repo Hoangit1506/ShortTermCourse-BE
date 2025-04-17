@@ -3,6 +3,8 @@ package com.short_term_course.controller;
 import com.short_term_course.dto.api.ApiResponse;
 import com.short_term_course.service.UploadService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/uploads")
 @RequiredArgsConstructor
+@Slf4j
 public class UploadController {
     private final UploadService uploadService;
 
@@ -46,14 +49,14 @@ public class UploadController {
         }
     }
 
-    // 3. Promo video (ADMIN)
+//     3. Promo video (ADMIN)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/courses/{courseId}/video")
     public ResponseEntity<ApiResponse<String>> uploadCourseVideo(
             @PathVariable String courseId,
             @RequestParam("file") MultipartFile file) {
         try {
-            if (file.getSize() > 50L * 1024 * 1024) {
+            if (file.getSize() > 100L * 1024 * 1024) {
                 return ResponseEntity.badRequest()
                         .body(ApiResponse.<String>builder().success(false).message("File too large").build());
             }
@@ -65,6 +68,40 @@ public class UploadController {
                     .body(ApiResponse.<String>builder().success(false).message("Upload failed").build());
         }
     }
+
+//    // 3. Promo video (ADMIN)
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+//    @PostMapping(
+//            value = "/courses/{courseId}/video",
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    public ResponseEntity<ApiResponse<String>> uploadCourseVideo(
+//            @PathVariable String courseId,
+//            @RequestParam("file") MultipartFile file) {
+//        try {
+//            if (file.getSize() > 100L * 1024 * 1024) {
+//                return ResponseEntity.badRequest()
+//                        .body(ApiResponse.<String>builder()
+//                                .success(false)
+//                                .message("File too large (>500MB)")
+//                                .build());
+//            }
+//            String url = uploadService.uploadCourseVideo(courseId, file);
+//            return ResponseEntity.ok(ApiResponse.<String>builder()
+//                    .code("upload-s-03")
+//                    .message("Video uploaded")
+//                    .data(url)
+//                    .build());
+//        } catch (Exception e) {
+//            // log đầy đủ để xem nguyên nhân
+//            log.error("Failed to upload course video for {}: {}", courseId, e.getMessage(), e);
+//            return ResponseEntity.status(500)
+//                    .body(ApiResponse.<String>builder()
+//                            .success(false)
+//                            .message("Upload failed: " + e.getMessage())
+//                            .build());
+//        }
+//    }
 
     // 4. Delete file
     @PreAuthorize("hasAnyRole('ADMIN','LECTURER','USER')")

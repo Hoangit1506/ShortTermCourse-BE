@@ -16,33 +16,16 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService service;
 
-    // 1. Lấy tất cả
-//    @GetMapping
-//    public ResponseEntity<ApiResponse<List<CategoryDto>>> getAll() {
-//        List<CategoryDto> list = service.getAll();
-//        return ResponseEntity.ok(ApiResponse.<List<CategoryDto>>builder().data(list).build());
-//    }
-
-//    @GetMapping
-//    public ResponseEntity<ApiResponse<Page<CategoryDto>>> getAllPaged(
-//            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-//        Page<CategoryDto> page = service.getAll(pageable);
-//        return ResponseEntity.ok(ApiResponse.<Page<CategoryDto>>builder()
-//                .data(page)
-//                .code("cat-s-01")
-//                .message("Get categories with pagination")
-//                .build());
-//    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<PagedResponse<CategoryDto>>> getAllPaged(
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        PagedResponse<CategoryDto> page = service.getAll(pageable);
+        PagedResponse<CategoryDto> page = service.getAll(search, pageable);
         return ResponseEntity.ok(ApiResponse.<PagedResponse<CategoryDto>>builder()
                 .data(page)
                 .code("cat-s-01")

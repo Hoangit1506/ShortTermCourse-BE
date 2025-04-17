@@ -12,4 +12,5 @@ public interface ClassroomService {
     ClassroomDto getById(String id);
     void delete(String id);
     PagedResponse<ClassroomDto> list(Pageable pageable);
+    PagedResponse<ClassroomDto> filterOpenCourses(String categoryId, String startDate, String endDate, Pageable pageable);
 }

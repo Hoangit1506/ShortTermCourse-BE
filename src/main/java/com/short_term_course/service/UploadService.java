@@ -29,6 +29,15 @@ public class UploadService {
         return result.get("secure_url").toString();
     }
 
+//    private String doUpload(MultipartFile file, String folder, boolean isVideo) throws IOException {
+//        Map<String,Object> opts = ObjectUtils.asMap("folder", folder);
+//        if (isVideo) opts.put("resource_type", "video");
+//        // Sử dụng InputStream thay vì byte[] để giảm tải bộ nhớ
+//        Map<?,?> result = cloudinary.uploader()
+//                .upload(file.getInputStream(), opts);
+//        return result.get("secure_url").toString();
+//    }
+
     // 1. Upload avatar cho user
     public String uploadAvatar(MultipartFile file) throws IOException {
         String userId = securityUtil.getAccountId();
@@ -73,4 +82,3 @@ public class UploadService {
         cloudinary.uploader().destroy(publicId, opts);
     }
 }
-

@@ -25,7 +25,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final String[] POST_PUBLIC_ROUTES = {"/auth/**", "/", "/login", "/oauth2/**"};
-    private final String[] GET_PUBLIC_ROUTES = {"/auth/**", "/", "/login", "/oauth2/**"};
+    private final String[] GET_PUBLIC_ROUTES = {"/auth/**", "/", "/login", "/oauth2/**", "/api/categories/**", "/api/courses/**", "/api/classrooms/**"};
 
     @Autowired
     public JwtDecoder jwtDecoder;

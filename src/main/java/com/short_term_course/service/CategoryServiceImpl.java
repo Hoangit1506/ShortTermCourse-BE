@@ -34,8 +34,13 @@ public class CategoryServiceImpl implements CategoryService {
 //    }
 
     @Override
-    public PagedResponse<CategoryDto> getAll(Pageable pageable) {
-        Page<Category> page = repo.findAll(pageable);
+    public PagedResponse<CategoryDto> getAll(String search, Pageable pageable) {
+        Page<Category> page;
+        if (search != null && !search.isBlank()) {
+            page = repo.findByNameContainingIgnoreCase(search, pageable);
+        } else {
+            page = repo.findAll(pageable);
+        }
         List<CategoryDto> dtos = page.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
