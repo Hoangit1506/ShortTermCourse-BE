@@ -18,10 +18,12 @@ import com.short_term_course.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,36 +40,178 @@ public class LecturerServiceImpl implements LecturerService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
-    public PagedResponse<LecturerDto> list(Pageable pageable) {
-        Page<Account> page = accountRepo.findByRolesContains(Role.LECTURER, pageable);
+    public PagedResponse<LecturerDto> list(String keyword, String categoryId, Pageable pageable) {
+//        // Tìm giảng viên theo role trước
+//        Page<Account> page = accountRepo.findByRolesContains(Role.LECTURER, Pageable.unpaged());
+////        Page<Account> page = accountRepo.findByRolesContains(Role.LECTURER, pageable);
+//
+//        List<Account> filtered = page.getContent();
+//
+//        // 1️⃣ Lọc theo tên nếu có
+//        if (keyword != null && !keyword.isBlank()) {
+//            filtered = filtered.stream()
+//                    .filter(acc -> acc.getDisplayName() != null &&
+//                            acc.getDisplayName().toLowerCase().contains(keyword.toLowerCase()))
+//                    .collect(Collectors.toList());
+//        }
+//
+//        // 2️⃣ Lọc theo chuyên ngành nếu có
+//        if (categoryId != null && !categoryId.isBlank()) {
+//            filtered = filtered.stream()
+//                    .filter(acc -> categoryRepo.findByLecturers_Account_Id(acc.getId())
+//                            .stream().anyMatch(cat -> cat.getId().equals(categoryId)))
+//                    .collect(Collectors.toList());
+//        }
+//
+//        // 3️⃣ Áp dụng phân trang thủ công
+//        int total = filtered.size();
+//        int start = Math.toIntExact(pageable.getOffset());
+//        int end = Math.min((start + pageable.getPageSize()), total);
+//        List<Account> paged = (start <= end) ? filtered.subList(start, end) : List.of();
+//
+//        List<LecturerDto> dtos = paged.stream().map(acc -> {
+//            LecturerProfile prof = profileRepo.findById(acc.getId()).orElse(new LecturerProfile());
+//            LecturerDto dto = mapper.toDto(acc, prof);
+//
+//            List<Category> cats = categoryRepo.findByLecturers_Account_Id(acc.getId());
+//            dto.setSpecializationIds(cats.stream().map(Category::getId).collect(Collectors.toSet()));
+//            dto.setSpecializationNames(cats.stream().map(Category::getName).collect(Collectors.toSet()));
+//            return dto;
+//        }).collect(Collectors.toList());
+//
+//        return PagedResponse.<LecturerDto>builder()
+//                .content(dtos)
+//                .pageNumber(pageable.getPageNumber())
+//                .pageSize(pageable.getPageSize())
+//                .totalElements((long) total)
+//                .totalPages((int) Math.ceil((double) total / pageable.getPageSize()))
+//                .last(end == total)
+//                .build();
 
-        List<LecturerDto> dtos = page.stream().map(acc -> {
-            // 1. Lấy profile (chỉ để map position/degree)
-            LecturerProfile prof = profileRepo.findById(acc.getId())
-                    .orElse(new LecturerProfile());
+//    // 1️⃣ Lấy toàn bộ giảng viên role=LECTURER (không phân trang)
+//        List<Account> allLecturers = accountRepo
+//                .findByRolesContains(Role.LECTURER, Pageable.unpaged())
+//                .getContent();
+//
+//            // 2️⃣ Lọc theo tên nếu có
+//            List<Account> filtered = allLecturers;
+//        if (keyword != null && !keyword.isBlank()) {
+//                filtered = filtered.stream()
+//                        .filter(acc -> acc.getDisplayName() != null &&
+//                                acc.getDisplayName().toLowerCase().contains(keyword.toLowerCase()))
+//                        .collect(Collectors.toList());
+//            }
+//
+//        // 3️⃣ Lọc theo chuyên ngành nếu có
+//        if (categoryId != null && !categoryId.isBlank()) {
+//                filtered = filtered.stream()
+//                        .filter(acc -> categoryRepo
+//                                .findByLecturers_Account_Id(acc.getId())
+//                                .stream().anyMatch(cat -> cat.getId().equals(categoryId)))
+//                        .collect(Collectors.toList());
+//            }
+//
+//        // 4️⃣ Áp dụng phân trang thủ công đúng trên filtered list
+//            long total = filtered.size();
+//            int pageNumber = pageable.getPageNumber();
+//            int pageSize   = pageable.getPageSize();
+//            int start = pageNumber * pageSize;
+//            int end   = Math.min(start + pageSize, (int) total);
+//
+//            List<Account> paged = (start <= end)
+//                    ? filtered.subList(start, end)
+//                    : List.of();
+//
+//            // 5️⃣ Map sang DTO
+//            List<LecturerDto> dtos = paged.stream().map(acc -> {
+//                LecturerProfile prof = profileRepo.findById(acc.getId()).orElse(new LecturerProfile());
+//                LecturerDto dto = mapper.toDto(acc, prof);
+//                List<Category> cats = categoryRepo.findByLecturers_Account_Id(acc.getId());
+//                dto.setSpecializationIds(
+//                        cats.stream().map(Category::getId).collect(Collectors.toSet()));
+//                dto.setSpecializationNames(
+//                        cats.stream().map(Category::getName).collect(Collectors.toSet()));
+//                return dto;
+//            }).collect(Collectors.toList());
+//
+//        // 6️⃣ Trả về PagedResponse
+//        return PagedResponse.<LecturerDto>builder()
+//            .content(dtos)
+//            .pageNumber(pageNumber)
+//            .pageSize(pageSize)
+//            .totalElements(total)
+//            .totalPages((int) Math.ceil((double) total / pageSize))
+//                    .last(end == total)
+//            .build();
 
-            // 2. Map các field cơ bản
+        // 1️⃣ Lấy toàn bộ giảng viên role=LECTURER
+        List<Account> allLecturers = accountRepo
+                .findByRolesContains(Role.LECTURER, Pageable.unpaged())
+                .getContent();
+
+// 2️⃣ Lọc theo tên nếu có
+        List<Account> filtered = allLecturers;
+        if (keyword != null && !keyword.isBlank()) {
+            filtered = filtered.stream()
+                    .filter(acc -> acc.getDisplayName() != null &&
+                            acc.getDisplayName().toLowerCase().contains(keyword.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+// 3️⃣ Lọc theo chuyên ngành nếu có
+        if (categoryId != null && !categoryId.isBlank()) {
+            filtered = filtered.stream()
+                    .filter(acc -> categoryRepo
+                            .findByLecturers_Account_Id(acc.getId())
+                            .stream().anyMatch(cat -> cat.getId().equals(categoryId)))
+                    .collect(Collectors.toList());
+        }
+
+// 🔴 4️⃣ SẮP XẾP theo tên (nếu có khai báo trong pageable)
+        if (pageable.getSort().isSorted()) {
+            for (Sort.Order order : pageable.getSort()) {
+                if (order.getProperty().equalsIgnoreCase("displayName")) {
+                    Comparator<Account> comparator = Comparator.comparing(
+                            acc -> acc.getDisplayName() != null ? acc.getDisplayName().toLowerCase() : ""
+                    );
+                    if (order.getDirection().isDescending()) {
+                        comparator = comparator.reversed();
+                    }
+                    filtered = filtered.stream().sorted(comparator).collect(Collectors.toList());
+                }
+            }
+        }
+
+// 5️⃣ Áp dụng phân trang
+        long total = filtered.size();
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int start = pageNumber * pageSize;
+        int end = Math.min(start + pageSize, (int) total);
+        List<Account> paged = (start <= end) ? filtered.subList(start, end) : List.of();
+
+// 6️⃣ Map sang DTO
+        List<LecturerDto> dtos = paged.stream().map(acc -> {
+            LecturerProfile prof = profileRepo.findById(acc.getId()).orElse(new LecturerProfile());
             LecturerDto dto = mapper.toDto(acc, prof);
-
-            // 3. Thủ công load chuyên ngành
             List<Category> cats = categoryRepo.findByLecturers_Account_Id(acc.getId());
-            dto.setSpecializationIds(
-                    cats.stream().map(Category::getId).collect(Collectors.toSet()));
-            dto.setSpecializationNames(
-                    cats.stream().map(Category::getName).collect(Collectors.toSet()));
-
+            dto.setSpecializationIds(cats.stream().map(Category::getId).collect(Collectors.toSet()));
+            dto.setSpecializationNames(cats.stream().map(Category::getName).collect(Collectors.toSet()));
             return dto;
         }).collect(Collectors.toList());
 
+// 7️⃣ Trả về
         return PagedResponse.<LecturerDto>builder()
                 .content(dtos)
-                .pageNumber(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .last(page.isLast())
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalElements(total)
+                .totalPages((int) Math.ceil((double) total / pageSize))
+                .last(end == total)
                 .build();
+
     }
+
 
     @Override
     public LecturerDto getById(String id) {
@@ -123,32 +267,49 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     @Transactional
     public LecturerDto update(String id, UpdateLecturerRequest dto) {
+        // 1️⃣ Lấy account + profile
         Account acc = accountRepo.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Lecturer not found"));
         LecturerProfile prof = profileRepo.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Profile not found"));
 
+
+        // 2️⃣ Cập nhật thông tin cơ bản của account
         if (dto.getDisplayName() != null) acc.setDisplayName(dto.getDisplayName());
         if (dto.getPhoneNumber() != null) acc.setPhoneNumber(dto.getPhoneNumber());
-        if (dto.getAvatar() != null) acc.setAvatar(dto.getAvatar());
+        if (dto.getAvatar()     != null) acc.setAvatar(dto.getAvatar());
+        if (dto.getDob() != null) acc.setDob(dto.getDob());
+
         accountRepo.save(acc);
 
-        // Update position/degree
+        // 3️⃣ Cập nhật position/degree
         mapper.updateProfileFromDto(dto, prof);
 
+        // 4️⃣ XỬ LÝ specializations: clear rồi mới addAll
         if (dto.getSpecializationIds() != null) {
+            // 1️⃣ Xóa hết dòng cũ
+            profileRepo.deleteSpecializationsByAccId(id);
+
+            // 2️⃣ Lấy entities Category mới
             Set<Category> cats = categoryRepo.findAllById(dto.getSpecializationIds())
                     .stream().collect(Collectors.toSet());
+
+            // 3️⃣ Gán lại
             prof.setSpecializations(cats);
+            profileRepo.save(prof);
         }
 
+        // 5️⃣ Lưu profile
         profileRepo.save(prof);
 
-        // map thủ công chuyên ngành
-        Set<Category> cats = categoryRepo.findByLecturers_Account_Id(id).stream().collect(Collectors.toSet());
+        // 6️⃣ Build lại DTO để trả về
+        Set<Category> finalCats = categoryRepo.findByLecturers_Account_Id(id)
+                .stream().collect(Collectors.toSet());
         LecturerDto result = mapper.toDto(acc, prof);
-        result.setSpecializationIds(cats.stream().map(Category::getId).collect(Collectors.toSet()));
-        result.setSpecializationNames(cats.stream().map(Category::getName).collect(Collectors.toSet()));
+        result.setSpecializationIds(
+                finalCats.stream().map(Category::getId).collect(Collectors.toSet()));
+        result.setSpecializationNames(
+                finalCats.stream().map(Category::getName).collect(Collectors.toSet()));
         return result;
     }
 

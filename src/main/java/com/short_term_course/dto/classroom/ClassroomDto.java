@@ -23,5 +23,6 @@ public class ClassroomDto {
     String place;
     int capacity;
     int enrolled;
+    String categoryName;
 }
 

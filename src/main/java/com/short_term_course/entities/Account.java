@@ -56,8 +56,4 @@ public class Account {
     @CollectionTable(name = "accounts_roles", joinColumns = @JoinColumn(name = "acc_id"))
     @Column(name = "role_name")
     Set<Role> roles = new HashSet<>();
-
-//    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnore
-//    private LecturerProfile lecturerProfile;
 }

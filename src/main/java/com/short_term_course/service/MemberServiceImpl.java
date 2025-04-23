@@ -1,6 +1,7 @@
 package com.short_term_course.service;
 
 import com.short_term_course.dto.member.*;
+import com.short_term_course.dto.pagination.PagedResponse;
 import com.short_term_course.entities.*;
 import com.short_term_course.enums.*;
 import com.short_term_course.exception.AppException;
@@ -8,11 +9,15 @@ import com.short_term_course.mapper.MemberMapper;
 import com.short_term_course.repository.*;
 import com.short_term_course.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,10 @@ public class MemberServiceImpl implements MemberService {
         // 1. Lấy classroom
         Classroom c = classroomRepo.findById(dto.getClassroomId())
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Classroom not found"));
+        // Nếu ngày hôm nay đã qua ngày bắt đầu, thì không cho đăng ký
+        if (LocalDate.now().isAfter(c.getStartDate())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Đã quá hạn đăng ký");
+        }
         // 2. Kiểm tra capacity
         if (c.getEnrolled() >= c.getCapacity()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Classroom is full");
@@ -57,6 +66,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean isRegistered(String studentId, String classroomId) {
+        // Tạo composite key MemberId
+        MemberId mid = new MemberId(studentId, classroomId);
+        // Kiểm tra tồn tại trong member repo
+        return memberRepo.existsById(mid);
+    }
+
+    @Override
     public List<MemberDto> listByClassroom(String classroomId) {
         // Lecturer/ADMIN only
         return mapper.toDtoList(memberRepo.findByClassroomId(classroomId));
@@ -66,6 +84,21 @@ public class MemberServiceImpl implements MemberService {
     public List<MemberDto> listByStudent(String studentId) {
         // USER xem lớp đã đăng ký
         return mapper.toDtoList(memberRepo.findByStudentId(studentId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponse<MemberDto> getMyCourses(String studentId, String categoryId, String keyword, Pageable pageable) {
+        Page<Member> page = memberRepo.findMyCourses(studentId, categoryId, keyword, pageable);
+        List<MemberDto> dtos = page.getContent().stream().map(mapper::toDto).toList();
+        return new PagedResponse<>(
+                dtos,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
 
     @Override
@@ -101,4 +134,6 @@ public class MemberServiceImpl implements MemberService {
         // Lecturer/ADMIN remove student
         cancel(studentId, classroomId);
     }
+
+
 }

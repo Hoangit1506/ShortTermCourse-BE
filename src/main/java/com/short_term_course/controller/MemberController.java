@@ -2,17 +2,24 @@ package com.short_term_course.controller;
 
 import com.short_term_course.dto.api.ApiResponse;
 import com.short_term_course.dto.member.*;
+import com.short_term_course.dto.pagination.PagedResponse;
 import com.short_term_course.repository.ClassroomRepository;
 import com.short_term_course.service.ClassroomService;
 import com.short_term_course.service.MemberService;
 import com.short_term_course.util.jwt.BaseJWTUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -29,6 +36,21 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.<List<MemberDto>>builder().data(list).build());
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/members/my-courses")
+    public ResponseEntity<ApiResponse<PagedResponse<MemberDto>>> myCourses(
+            @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 10, sort = "courseName") Pageable pageable
+    ) {
+        String studentId = BaseJWTUtil.getPayload().getId();
+        var result = service.getMyCourses(studentId, categoryId, keyword, pageable);
+        return ResponseEntity.ok(ApiResponse.<PagedResponse<MemberDto>>builder()
+                .data(result)
+                .build());
+    }
+
+
     // 2. Sinh viên enroll (USER)
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/members")
@@ -38,6 +60,18 @@ public class MemberController {
         MemberDto m = service.enroll(studentId, dto);
         return ResponseEntity.status(201)
                 .body(ApiResponse.<MemberDto>builder().data(m).build());
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/members/check")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkRegistered(
+            @RequestParam String classroomId) {
+        // Lấy studentId từ JWT
+        String studentId = BaseJWTUtil.getPayload().getId();
+        boolean registered = service.isRegistered(studentId, classroomId);
+        return ResponseEntity.ok(ApiResponse.<Map<String, Boolean>>builder()
+                .data(Map.of("registered", registered))
+                .build());
     }
 
     // 3. Sinh viên hủy đăng ký
@@ -79,4 +113,8 @@ public class MemberController {
         service.remove(classroomId, studentId);
         return ResponseEntity.ok(ApiResponse.<Void>builder().build());
     }
+
+
 }
+
+

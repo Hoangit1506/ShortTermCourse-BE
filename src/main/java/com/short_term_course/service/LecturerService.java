@@ -7,7 +7,7 @@ import com.short_term_course.dto.pagination.PagedResponse;
 import org.springframework.data.domain.Pageable;
 
 public interface LecturerService {
-    PagedResponse<LecturerDto> list(Pageable pageable);
+    PagedResponse<LecturerDto> list(String keyword, String categoryId, Pageable pageable);
     LecturerDto getById(String id);
     LecturerDto create(CreateLecturerRequest dto);
     LecturerDto update(String id, UpdateLecturerRequest dto);

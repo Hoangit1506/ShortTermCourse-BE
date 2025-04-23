@@ -9,6 +9,7 @@ import com.short_term_course.service.LecturerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,8 +24,10 @@ public class LecturerController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<ApiResponse<PagedResponse<LecturerDto>>> list(
-            @PageableDefault(size=10) Pageable pageable) {
-        var page = service.list(pageable);
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String categoryId,
+            @PageableDefault(size = 10, sort = "displayName", direction = Sort.Direction.ASC) Pageable pageable) {
+        var page = service.list(keyword, categoryId, pageable);
         return ResponseEntity.ok(ApiResponse.<PagedResponse<LecturerDto>>builder()
                 .data(page).build());
     }

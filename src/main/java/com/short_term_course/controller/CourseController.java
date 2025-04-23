@@ -69,4 +69,5 @@ public class CourseController {
         return ResponseEntity.ok(ApiResponse.<Void>builder()
                 .code("course-s-05").message("Course deleted").build());
     }
+
 }

@@ -3,6 +3,8 @@ package com.short_term_course.dto.lecturer;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -19,6 +21,8 @@ public class CreateLecturerRequest {
 
     @NotBlank
     String displayName;
+
+    LocalDate dob;
 
     String phoneNumber;
     String avatar;      // URL đã upload

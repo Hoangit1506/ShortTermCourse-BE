@@ -21,30 +21,6 @@ public class CourseServiceImpl implements CourseService {
     private final CategoryRepository categoryRepo;
     private final CourseMapper mapper;
 
-//    @Override
-//    public PagedResponse<CourseDto> list(String categoryId, String keyword, Pageable pageable) {
-//        Page<Course> page;
-//        if (categoryId != null) {
-//            page = courseRepo.findByCategoryId(categoryId, pageable);
-//        } else if (keyword != null) {
-//            page = courseRepo.findByNameContainingIgnoreCase(keyword, pageable);
-//        } else {
-//            page = courseRepo.findAll(pageable);
-//        }
-//        List<CourseDto> dtos = page.stream()
-//                .map(mapper::toDto)
-//                .collect(Collectors.toList());
-//
-//        return PagedResponse.<CourseDto>builder()
-//                .content(dtos)
-//                .pageNumber(page.getNumber())
-//                .pageSize(page.getSize())
-//                .totalElements(page.getTotalElements())
-//                .totalPages(page.getTotalPages())
-//                .last(page.isLast())
-//                .build();
-//    }
-
     @Override
     public PagedResponse<CourseDto> list(String categoryId, String keyword, Pageable pageable) {
         Page<Course> page;
