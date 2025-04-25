@@ -21,18 +21,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repo;
     private final CategoryMapper mapper;
 
-//    @Override
-//    public List<CategoryDto> getAll() {
-//        return repo.findAll().stream()
-//                .map(mapper::toDto)
-//                .collect(Collectors.toList());
-//    }
-
-//    @Override
-//    public Page<CategoryDto> getAll(Pageable pageable) {
-//        return repo.findAll(pageable).map(mapper::toDto);
-//    }
-
     @Override
     public PagedResponse<CategoryDto> getAll(String search, Pageable pageable) {
         Page<Category> page;
@@ -88,7 +76,6 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(String id) {
         Category c = repo.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Category not found"));
-        // Nếu cần: kiểm tra xem có khóa học liên quan không, nếu có có thể cấm xóa
         if (!c.getCourses().isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Cannot delete category with courses");
         }

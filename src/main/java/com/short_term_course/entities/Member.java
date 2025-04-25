@@ -29,7 +29,7 @@ public class Member {
     Classroom classroom;
 
     @Column(name = "member_score")
-    Double score; // Điểm cuối khóa (nếu có)
+    Double score; 
 
     @Enumerated(EnumType.STRING)
     LearningStatus learningStatus;

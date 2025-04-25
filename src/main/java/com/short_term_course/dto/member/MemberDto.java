@@ -13,12 +13,9 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MemberDto {
-    String categoryId;
     String classroomId;
     String classroomName;
-    String courseId;
-    String courseName;
-    String courseThumbnail;
+    String lecturerName;
     LocalDate startDate;
     LocalDate endDate;
     String place;
@@ -26,6 +23,10 @@ public class MemberDto {
     int enrolled;
     String studentId;
     String studentName;
+    LocalDate studentDob;
+    String studentEmail;
+    String studentPhone;
+    String studentAvatar;
     Double score;
     LearningStatus learningStatus;
     TuitionStatus tuitionStatus;

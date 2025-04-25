@@ -33,7 +33,6 @@ public class CategoryController {
                 .build());
     }
 
-    // 2. Lấy theo ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CategoryDto>> getById(@PathVariable String id) {
         CategoryDto dto = service.getById(id);
@@ -44,7 +43,6 @@ public class CategoryController {
                 .build());
     }
 
-    // 3. Tạo mới (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<CategoryDto>> create(
@@ -58,7 +56,6 @@ public class CategoryController {
                         .build());
     }
 
-    // 4. Cập nhật (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<CategoryDto>> update(
@@ -72,7 +69,6 @@ public class CategoryController {
                 .build());
     }
 
-    // 5. Xóa (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {

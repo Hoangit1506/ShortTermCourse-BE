@@ -40,16 +40,13 @@ public class AuthService {
     }
 
     public AuthResponse verifyRegister(AuthRegisterRequest request) {
-        // Find Account if not existed
         boolean existedAccount = accountRepository.existsByEmailAndIsLocalTrue(request.getEmail());
         if(existedAccount){
             throw new AppException(HttpStatus.BAD_REQUEST, "Email has existed", "auth-e-01");
         }
-        // Hash password
         String hashedPassword = passwordUtil.encodePassword(request.getPassword());
         request.setPassword(hashedPassword);
 
-        // Roles for normal Account
         Set<Role> roles = new HashSet<>();
         roles.add(Role.USER);
         Account account = Account.builder()
@@ -60,7 +57,6 @@ public class AuthService {
         account.setRoles(roles);
         accountRepository.save(account);
 
-        // Generate a pair of token
         String accessTokenString =  accessTokenUtil.generateToken(accountMapper.toJWTPayloadDto(account));
         String refreshTokenString =  refreshTokenUtil.generateToken(accountMapper.toJWTPayloadDto(account),account);
         return AuthResponse.builder()

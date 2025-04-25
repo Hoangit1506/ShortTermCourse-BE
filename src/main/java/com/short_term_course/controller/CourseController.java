@@ -20,7 +20,6 @@ import java.util.List;
 public class CourseController {
     private final CourseService service;
 
-    // 1. List có phân trang, filter
     @GetMapping
     public ResponseEntity<ApiResponse<PagedResponse<CourseDto>>> list(
             @RequestParam(required=false) String categoryId,
@@ -31,7 +30,6 @@ public class CourseController {
                 .code("course-s-01").message("Fetched courses").data(page).build());
     }
 
-    // 2. Chi tiết
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CourseDto>> detail(@PathVariable String id) {
         CourseDto dto = service.getById(id);
@@ -39,7 +37,6 @@ public class CourseController {
                 .code("course-s-02").message("Course detail").data(dto).build());
     }
 
-    // 3. Tạo mới (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<CourseDto>> create(
@@ -50,7 +47,6 @@ public class CourseController {
                         .code("course-s-03").message("Course created").data(created).build());
     }
 
-    // 4. Cập nhật (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<CourseDto>> update(
@@ -61,7 +57,6 @@ public class CourseController {
                 .code("course-s-04").message("Course updated").data(updated).build());
     }
 
-    // 5. Xóa (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {

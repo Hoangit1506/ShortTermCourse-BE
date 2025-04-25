@@ -29,20 +29,16 @@ public class CourseServiceImpl implements CourseService {
         boolean hasKw  = keyword    != null && !keyword.isBlank();
 
         if (hasCat && hasKw) {
-            // cả keyword + category
             page = courseRepo
                     .findByNameContainingIgnoreCaseAndCategoryId(keyword, categoryId, pageable);
 
         } else if (hasCat) {
-            // chỉ filter theo chuyên ngành
             page = courseRepo.findByCategoryId(categoryId, pageable);
 
         } else if (hasKw) {
-            // chỉ filter theo từ khóa tên
             page = courseRepo.findByNameContainingIgnoreCase(keyword, pageable);
 
         } else {
-            // không có điều kiện filter
             page = courseRepo.findAll(pageable);
         }
 

@@ -39,10 +39,8 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     @Override
     public PagedResponse<ClassroomDto> listAdmin(String keyword, String categoryId, String courseId, String lecturerId, Pageable pageable) {
-        // 1️⃣ Lấy toàn bộ (unpaged) để lọc thủ công
         List<Classroom> all = classroomRepo.findAll();
 
-        // 2️⃣ Lọc theo keyword (tên lớp)
         Stream<Classroom> stream = all.stream();
         if (keyword != null && !keyword.isBlank()) {
             String kw = keyword.toLowerCase();
@@ -50,24 +48,20 @@ public class ClassroomServiceImpl implements ClassroomService {
                     && c.getName().toLowerCase().contains(kw));
         }
 
-        // 3️⃣ Lọc theo chuyên ngành của khóa học
         if (categoryId != null && !categoryId.isBlank()) {
             stream = stream.filter(c -> c.getCourse().getCategory().getId().equals(categoryId));
         }
 
-        // 4️⃣ Lọc theo khóa học
         if (courseId != null && !courseId.isBlank()) {
             stream = stream.filter(c -> c.getCourse().getId().equals(courseId));
         }
 
-        // 5️⃣ Lọc theo giảng viên
         if (lecturerId != null && !lecturerId.isBlank()) {
             stream = stream.filter(c -> c.getLecturer().getId().equals(lecturerId));
         }
 
         List<Classroom> filtered = stream.collect(Collectors.toList());
 
-        //  ➡️  Sort lớp theo startDate gần nhất với ngày hôm nay, rồi theo tên
         LocalDate today = LocalDate.now();
         filtered.sort(Comparator
                 .comparingLong((Classroom c) ->
@@ -76,7 +70,6 @@ public class ClassroomServiceImpl implements ClassroomService {
                 .thenComparing(Classroom::getName)
         );
 
-        // 6️⃣ Phân trang thủ công
         int total = filtered.size();
         int pageNum  = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
@@ -87,12 +80,10 @@ public class ClassroomServiceImpl implements ClassroomService {
                 ? filtered.subList(start, end)
                 : List.of();
 
-        // 7️⃣ Map sang DTO
         List<ClassroomDto> dtos = paged.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
 
-        // 8️⃣ Trả về PagedResponse
         return PagedResponse.<ClassroomDto>builder()
                 .content(dtos)
                 .pageNumber(pageNum)

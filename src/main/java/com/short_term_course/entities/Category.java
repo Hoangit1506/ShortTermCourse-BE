@@ -30,7 +30,6 @@ public class Category {
     @JsonIgnore
     List<Course> courses = new ArrayList<>();
 
-    // Optional: ngược lại relation ManyToMany
     @ManyToMany(mappedBy = "specializations")
     @JsonIgnore
     Set<LecturerProfile> lecturers = new HashSet<>();

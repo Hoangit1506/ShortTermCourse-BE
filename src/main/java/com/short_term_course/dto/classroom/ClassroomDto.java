@@ -16,8 +16,17 @@ public class ClassroomDto {
     String courseId;
     String courseName;
     String courseThumbnail;
+    Long coursePrice;
+    String courseDescription;
+    String courseSuitable;
+    String courseContent;
+    String coursePromoVideo;
     String lecturerId;
     String lecturerName;
+    LocalDate lecturerDob;
+    String lecturerEmail;
+    String lecturerPhone;
+    String lecturerAvatar;
     LocalDate startDate;
     LocalDate endDate;
     String place;

@@ -41,115 +41,11 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public PagedResponse<LecturerDto> list(String keyword, String categoryId, Pageable pageable) {
-//        // Tìm giảng viên theo role trước
-//        Page<Account> page = accountRepo.findByRolesContains(Role.LECTURER, Pageable.unpaged());
-////        Page<Account> page = accountRepo.findByRolesContains(Role.LECTURER, pageable);
-//
-//        List<Account> filtered = page.getContent();
-//
-//        // 1️⃣ Lọc theo tên nếu có
-//        if (keyword != null && !keyword.isBlank()) {
-//            filtered = filtered.stream()
-//                    .filter(acc -> acc.getDisplayName() != null &&
-//                            acc.getDisplayName().toLowerCase().contains(keyword.toLowerCase()))
-//                    .collect(Collectors.toList());
-//        }
-//
-//        // 2️⃣ Lọc theo chuyên ngành nếu có
-//        if (categoryId != null && !categoryId.isBlank()) {
-//            filtered = filtered.stream()
-//                    .filter(acc -> categoryRepo.findByLecturers_Account_Id(acc.getId())
-//                            .stream().anyMatch(cat -> cat.getId().equals(categoryId)))
-//                    .collect(Collectors.toList());
-//        }
-//
-//        // 3️⃣ Áp dụng phân trang thủ công
-//        int total = filtered.size();
-//        int start = Math.toIntExact(pageable.getOffset());
-//        int end = Math.min((start + pageable.getPageSize()), total);
-//        List<Account> paged = (start <= end) ? filtered.subList(start, end) : List.of();
-//
-//        List<LecturerDto> dtos = paged.stream().map(acc -> {
-//            LecturerProfile prof = profileRepo.findById(acc.getId()).orElse(new LecturerProfile());
-//            LecturerDto dto = mapper.toDto(acc, prof);
-//
-//            List<Category> cats = categoryRepo.findByLecturers_Account_Id(acc.getId());
-//            dto.setSpecializationIds(cats.stream().map(Category::getId).collect(Collectors.toSet()));
-//            dto.setSpecializationNames(cats.stream().map(Category::getName).collect(Collectors.toSet()));
-//            return dto;
-//        }).collect(Collectors.toList());
-//
-//        return PagedResponse.<LecturerDto>builder()
-//                .content(dtos)
-//                .pageNumber(pageable.getPageNumber())
-//                .pageSize(pageable.getPageSize())
-//                .totalElements((long) total)
-//                .totalPages((int) Math.ceil((double) total / pageable.getPageSize()))
-//                .last(end == total)
-//                .build();
 
-//    // 1️⃣ Lấy toàn bộ giảng viên role=LECTURER (không phân trang)
-//        List<Account> allLecturers = accountRepo
-//                .findByRolesContains(Role.LECTURER, Pageable.unpaged())
-//                .getContent();
-//
-//            // 2️⃣ Lọc theo tên nếu có
-//            List<Account> filtered = allLecturers;
-//        if (keyword != null && !keyword.isBlank()) {
-//                filtered = filtered.stream()
-//                        .filter(acc -> acc.getDisplayName() != null &&
-//                                acc.getDisplayName().toLowerCase().contains(keyword.toLowerCase()))
-//                        .collect(Collectors.toList());
-//            }
-//
-//        // 3️⃣ Lọc theo chuyên ngành nếu có
-//        if (categoryId != null && !categoryId.isBlank()) {
-//                filtered = filtered.stream()
-//                        .filter(acc -> categoryRepo
-//                                .findByLecturers_Account_Id(acc.getId())
-//                                .stream().anyMatch(cat -> cat.getId().equals(categoryId)))
-//                        .collect(Collectors.toList());
-//            }
-//
-//        // 4️⃣ Áp dụng phân trang thủ công đúng trên filtered list
-//            long total = filtered.size();
-//            int pageNumber = pageable.getPageNumber();
-//            int pageSize   = pageable.getPageSize();
-//            int start = pageNumber * pageSize;
-//            int end   = Math.min(start + pageSize, (int) total);
-//
-//            List<Account> paged = (start <= end)
-//                    ? filtered.subList(start, end)
-//                    : List.of();
-//
-//            // 5️⃣ Map sang DTO
-//            List<LecturerDto> dtos = paged.stream().map(acc -> {
-//                LecturerProfile prof = profileRepo.findById(acc.getId()).orElse(new LecturerProfile());
-//                LecturerDto dto = mapper.toDto(acc, prof);
-//                List<Category> cats = categoryRepo.findByLecturers_Account_Id(acc.getId());
-//                dto.setSpecializationIds(
-//                        cats.stream().map(Category::getId).collect(Collectors.toSet()));
-//                dto.setSpecializationNames(
-//                        cats.stream().map(Category::getName).collect(Collectors.toSet()));
-//                return dto;
-//            }).collect(Collectors.toList());
-//
-//        // 6️⃣ Trả về PagedResponse
-//        return PagedResponse.<LecturerDto>builder()
-//            .content(dtos)
-//            .pageNumber(pageNumber)
-//            .pageSize(pageSize)
-//            .totalElements(total)
-//            .totalPages((int) Math.ceil((double) total / pageSize))
-//                    .last(end == total)
-//            .build();
-
-        // 1️⃣ Lấy toàn bộ giảng viên role=LECTURER
         List<Account> allLecturers = accountRepo
                 .findByRolesContains(Role.LECTURER, Pageable.unpaged())
                 .getContent();
 
-// 2️⃣ Lọc theo tên nếu có
         List<Account> filtered = allLecturers;
         if (keyword != null && !keyword.isBlank()) {
             filtered = filtered.stream()
@@ -158,7 +54,6 @@ public class LecturerServiceImpl implements LecturerService {
                     .collect(Collectors.toList());
         }
 
-// 3️⃣ Lọc theo chuyên ngành nếu có
         if (categoryId != null && !categoryId.isBlank()) {
             filtered = filtered.stream()
                     .filter(acc -> categoryRepo
@@ -167,7 +62,6 @@ public class LecturerServiceImpl implements LecturerService {
                     .collect(Collectors.toList());
         }
 
-// 🔴 4️⃣ SẮP XẾP theo tên (nếu có khai báo trong pageable)
         if (pageable.getSort().isSorted()) {
             for (Sort.Order order : pageable.getSort()) {
                 if (order.getProperty().equalsIgnoreCase("displayName")) {
@@ -182,7 +76,6 @@ public class LecturerServiceImpl implements LecturerService {
             }
         }
 
-// 5️⃣ Áp dụng phân trang
         long total = filtered.size();
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
@@ -190,7 +83,6 @@ public class LecturerServiceImpl implements LecturerService {
         int end = Math.min(start + pageSize, (int) total);
         List<Account> paged = (start <= end) ? filtered.subList(start, end) : List.of();
 
-// 6️⃣ Map sang DTO
         List<LecturerDto> dtos = paged.stream().map(acc -> {
             LecturerProfile prof = profileRepo.findById(acc.getId()).orElse(new LecturerProfile());
             LecturerDto dto = mapper.toDto(acc, prof);
@@ -200,7 +92,6 @@ public class LecturerServiceImpl implements LecturerService {
             return dto;
         }).collect(Collectors.toList());
 
-// 7️⃣ Trả về
         return PagedResponse.<LecturerDto>builder()
                 .content(dtos)
                 .pageNumber(pageNumber)
@@ -223,7 +114,6 @@ public class LecturerServiceImpl implements LecturerService {
 
         LecturerDto dto = mapper.toDto(acc, prof);
 
-        // Thủ công load chuyên ngành
         List<Category> cats = categoryRepo.findByLecturers_Account_Id(id);
         dto.setSpecializationIds(
                 cats.stream().map(Category::getId).collect(Collectors.toSet()));
@@ -246,7 +136,6 @@ public class LecturerServiceImpl implements LecturerService {
         acc.setRoles(Set.of(Role.LECTURER, Role.USER));
         accountRepo.save(acc);
 
-        // profile có specializations luôn được khởi tạo
         LecturerProfile prof = LecturerProfile.builder()
                 .account(acc)
                 .position(dto.getPosition())
@@ -257,7 +146,6 @@ public class LecturerServiceImpl implements LecturerService {
         prof.setSpecializations(cats);
         profileRepo.save(prof);
 
-        // map thủ công specialization cho DTO
         LecturerDto result = mapper.toDto(acc, prof);
         result.setSpecializationIds(cats.stream().map(Category::getId).collect(Collectors.toSet()));
         result.setSpecializationNames(cats.stream().map(Category::getName).collect(Collectors.toSet()));
@@ -267,14 +155,12 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     @Transactional
     public LecturerDto update(String id, UpdateLecturerRequest dto) {
-        // 1️⃣ Lấy account + profile
         Account acc = accountRepo.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Lecturer not found"));
         LecturerProfile prof = profileRepo.findById(id)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Profile not found"));
 
 
-        // 2️⃣ Cập nhật thông tin cơ bản của account
         if (dto.getDisplayName() != null) acc.setDisplayName(dto.getDisplayName());
         if (dto.getPhoneNumber() != null) acc.setPhoneNumber(dto.getPhoneNumber());
         if (dto.getAvatar()     != null) acc.setAvatar(dto.getAvatar());
@@ -282,27 +168,20 @@ public class LecturerServiceImpl implements LecturerService {
 
         accountRepo.save(acc);
 
-        // 3️⃣ Cập nhật position/degree
         mapper.updateProfileFromDto(dto, prof);
 
-        // 4️⃣ XỬ LÝ specializations: clear rồi mới addAll
         if (dto.getSpecializationIds() != null) {
-            // 1️⃣ Xóa hết dòng cũ
             profileRepo.deleteSpecializationsByAccId(id);
 
-            // 2️⃣ Lấy entities Category mới
             Set<Category> cats = categoryRepo.findAllById(dto.getSpecializationIds())
                     .stream().collect(Collectors.toSet());
 
-            // 3️⃣ Gán lại
             prof.setSpecializations(cats);
             profileRepo.save(prof);
         }
 
-        // 5️⃣ Lưu profile
         profileRepo.save(prof);
 
-        // 6️⃣ Build lại DTO để trả về
         Set<Category> finalCats = categoryRepo.findByLecturers_Account_Id(id)
                 .stream().collect(Collectors.toSet());
         LecturerDto result = mapper.toDto(acc, prof);

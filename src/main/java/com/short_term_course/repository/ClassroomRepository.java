@@ -27,6 +27,3 @@ public interface ClassroomRepository extends JpaRepository<Classroom, String> {
             Pageable pageable
     );
 }
-
-//ORDER BY c.startDate ASC, c.name ASC
-//OR LOWER(c.course.name) LIKE CONCAT('%', LOWER(:keyword), '%')

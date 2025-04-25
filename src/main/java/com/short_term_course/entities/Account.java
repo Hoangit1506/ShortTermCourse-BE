@@ -50,7 +50,6 @@ public class Account {
     @Column(name = "acc_is_local", nullable = false)
     Boolean isLocal;
 
-    //Use Enum Role to make relationship between Account and Role
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "accounts_roles", joinColumns = @JoinColumn(name = "acc_id"))

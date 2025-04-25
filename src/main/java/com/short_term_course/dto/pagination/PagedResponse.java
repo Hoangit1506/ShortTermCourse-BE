@@ -12,12 +12,12 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PagedResponse<T> {
-    List<T> content;       // Danh sách item
-    int pageNumber;              // Trang hiện tại (zero-based)
-    int pageSize;              // Kích thước trang
-    long totalElements;    // Tổng số phần tử
-    int totalPages;        // Tổng số trang
-    boolean last;          // Có phải trang cuối cùng không
+    List<T> content;
+    int pageNumber;
+    int pageSize;
+    long totalElements;
+    int totalPages;
+    boolean last;         
 
     public PagedResponse(List<T> content, Pageable pageable, long total) {
         this.content = content;

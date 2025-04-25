@@ -25,11 +25,11 @@ public class CreateLecturerRequest {
     LocalDate dob;
 
     String phoneNumber;
-    String avatar;      // URL đã upload
+    String avatar;
 
     String position;
     String degree;
 
     @NotEmpty(message="Phải chọn ít nhất 1 chuyên ngành")
-    Set<String> specializationIds; // danh sách categoryId
+    Set<String> specializationIds; 
 }

@@ -15,6 +15,6 @@ public class UpdateCourseRequest {
     Double price;
     String content;
     String categoryId;
-    String thumbnail;   // URL mới, nếu muốn thay đổi
-    String promoVideo;  // URL mới
+    String thumbnail;
+    String promoVideo;  
 }

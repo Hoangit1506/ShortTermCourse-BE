@@ -13,8 +13,7 @@ public interface MemberService {
     List<MemberDto> listByStudent(String studentId);
     MemberDto update(String classroomId, String studentId, UpdateMemberRequest dto);
     void cancel(String studentId, String classroomId);
-    void remove(String classroomId, String studentId); // Lecturer/ADMIN
+    void remove(String classroomId, String studentId);
     boolean isRegistered(String studentId, String classroomId);
-    PagedResponse<MemberDto> getMyCourses(String studentId, String categoryId, String keyword, Pageable pageable);
-
+    PagedResponse<MemberDto> getMyCourses(String studentId, String keyword, Pageable pageable);
 }

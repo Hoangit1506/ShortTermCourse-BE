@@ -19,7 +19,6 @@ import java.io.IOException;
 public class UploadController {
     private final UploadService uploadService;
 
-    // 1. Avatar (USER)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/avatar")
     public ResponseEntity<ApiResponse<String>> uploadAvatar(@RequestParam("file") MultipartFile file) {
@@ -33,7 +32,6 @@ public class UploadController {
         }
     }
 
-    // 2. Thumbnail (ADMIN)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/courses/{courseId}/thumbnail")
     public ResponseEntity<ApiResponse<String>> uploadCourseThumbnail(
@@ -49,7 +47,6 @@ public class UploadController {
         }
     }
 
-//     3. Promo video (ADMIN)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/courses/{courseId}/video")
     public ResponseEntity<ApiResponse<String>> uploadCourseVideo(
@@ -69,41 +66,6 @@ public class UploadController {
         }
     }
 
-//    // 3. Promo video (ADMIN)
-//    @PreAuthorize("hasAnyRole('ADMIN')")
-//    @PostMapping(
-//            value = "/courses/{courseId}/video",
-//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-//    )
-//    public ResponseEntity<ApiResponse<String>> uploadCourseVideo(
-//            @PathVariable String courseId,
-//            @RequestParam("file") MultipartFile file) {
-//        try {
-//            if (file.getSize() > 100L * 1024 * 1024) {
-//                return ResponseEntity.badRequest()
-//                        .body(ApiResponse.<String>builder()
-//                                .success(false)
-//                                .message("File too large (>500MB)")
-//                                .build());
-//            }
-//            String url = uploadService.uploadCourseVideo(courseId, file);
-//            return ResponseEntity.ok(ApiResponse.<String>builder()
-//                    .code("upload-s-03")
-//                    .message("Video uploaded")
-//                    .data(url)
-//                    .build());
-//        } catch (Exception e) {
-//            // log đầy đủ để xem nguyên nhân
-//            log.error("Failed to upload course video for {}: {}", courseId, e.getMessage(), e);
-//            return ResponseEntity.status(500)
-//                    .body(ApiResponse.<String>builder()
-//                            .success(false)
-//                            .message("Upload failed: " + e.getMessage())
-//                            .build());
-//        }
-//    }
-
-    // 4. Delete file
     @PreAuthorize("hasAnyRole('ADMIN','LECTURER','USER')")
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteFile(@RequestParam("url") String fileUrl) {

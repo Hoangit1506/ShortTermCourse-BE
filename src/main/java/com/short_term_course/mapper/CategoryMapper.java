@@ -8,15 +8,12 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
-    // Entity → DTO
     CategoryDto toDto(Category category);
 
-    // CreateRequest → Entity (chỉ gán name)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "courses", ignore = true)
     Category toEntity(CreateCategoryRequest dto);
 
-    // UpdateRequest → Entity (chỉ gán name)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "courses", ignore = true)

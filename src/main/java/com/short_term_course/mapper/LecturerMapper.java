@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface LecturerMapper {
-    // Map Account + Profile → DTO
     @Mapping(source="account.id",           target="id")
     @Mapping(source="account.email",        target="email")
     @Mapping(source="account.displayName",  target="displayName")
@@ -19,7 +18,6 @@ public interface LecturerMapper {
     @Mapping(source="profile.degree",       target="degree")
     LecturerDto toDto(Account account, LecturerProfile profile);
 
-    // Create Account từ CreateLecturerRequest
     @Mapping(target="id", ignore=true)
     @Mapping(source="dto.email", target="email")
     @Mapping(source="dto.password", target="password")
@@ -31,7 +29,6 @@ public interface LecturerMapper {
     @Mapping(target="isLocal", constant="true")
     Account toAccount(CreateLecturerRequest dto);
 
-    // Cập nhật LecturerProfile, bỏ qua specializations
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source="dto.position", target="position")
     @Mapping(source="dto.degree",   target="degree")

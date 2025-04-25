@@ -23,23 +23,23 @@ public class Course {
     @Column(name = "course_name", nullable = false, unique = true)
     String name;
 
-    @Lob   //tránh giới hạn độ dài
+    @Lob
     @Column(name = "course_description",
             columnDefinition = "LONGTEXT"
     )
     String description;
 
-    @Lob   //tránh giới hạn độ dài
+    @Lob
     @Column(
             name = "course_suitable",
             columnDefinition = "LONGTEXT"
     )
-    String suitable;  // Đối tượng phù hợp
+    String suitable;
 
     @Column(name = "course_price")
     Double price;
 
-    @Lob   //tránh giới hạn độ dài
+    @Lob   
     @Column(
             name = "course_content",
             columnDefinition = "LONGTEXT"
