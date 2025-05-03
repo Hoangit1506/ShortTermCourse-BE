@@ -3,6 +3,8 @@ package com.short_term_course.controller;
 import com.short_term_course.dto.api.ApiResponse;
 import com.short_term_course.service.UploadService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +15,10 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/uploads")
 @RequiredArgsConstructor
+@Slf4j
 public class UploadController {
     private final UploadService uploadService;
 
-    // 1. Avatar (USER)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/avatar")
     public ResponseEntity<ApiResponse<String>> uploadAvatar(@RequestParam("file") MultipartFile file) {
@@ -30,7 +32,6 @@ public class UploadController {
         }
     }
 
-    // 2. Thumbnail (ADMIN)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/courses/{courseId}/thumbnail")
     public ResponseEntity<ApiResponse<String>> uploadCourseThumbnail(
@@ -46,14 +47,13 @@ public class UploadController {
         }
     }
 
-    // 3. Promo video (ADMIN)
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/courses/{courseId}/video")
     public ResponseEntity<ApiResponse<String>> uploadCourseVideo(
             @PathVariable String courseId,
             @RequestParam("file") MultipartFile file) {
         try {
-            if (file.getSize() > 50L * 1024 * 1024) {
+            if (file.getSize() > 100L * 1024 * 1024) {
                 return ResponseEntity.badRequest()
                         .body(ApiResponse.<String>builder().success(false).message("File too large").build());
             }
@@ -66,7 +66,6 @@ public class UploadController {
         }
     }
 
-    // 4. Delete file
     @PreAuthorize("hasAnyRole('ADMIN','LECTURER','USER')")
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteFile(@RequestParam("url") String fileUrl) {

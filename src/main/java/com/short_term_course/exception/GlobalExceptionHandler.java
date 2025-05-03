@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
                 .code("auth-e-01")
                 .message("Authentication failed: " + e.getMessage())
                 .build();
-        return ResponseEntity.status(401).body(response); // 401 Unauthorized
+        return ResponseEntity.status(401).body(response);
     }
 
     //Xử lý lỗi phân quyền (Truy cập bị từ chối)
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
                 .code("auth-e-02")
                 .message("Access denied: " + e.getMessage())
                 .build();
-        return ResponseEntity.status(403).body(response); // 403 Forbidden
+        return ResponseEntity.status(403).body(response);
     }
 
     @ExceptionHandler(value = Exception.class)

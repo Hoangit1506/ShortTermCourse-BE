@@ -24,13 +24,24 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public PagedResponse<CourseDto> list(String categoryId, String keyword, Pageable pageable) {
         Page<Course> page;
-        if (categoryId != null) {
+
+        boolean hasCat = categoryId != null && !categoryId.isBlank();
+        boolean hasKw  = keyword    != null && !keyword.isBlank();
+
+        if (hasCat && hasKw) {
+            page = courseRepo
+                    .findByNameContainingIgnoreCaseAndCategoryId(keyword, categoryId, pageable);
+
+        } else if (hasCat) {
             page = courseRepo.findByCategoryId(categoryId, pageable);
-        } else if (keyword != null) {
+
+        } else if (hasKw) {
             page = courseRepo.findByNameContainingIgnoreCase(keyword, pageable);
+
         } else {
             page = courseRepo.findAll(pageable);
         }
+
         List<CourseDto> dtos = page.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
@@ -44,6 +55,7 @@ public class CourseServiceImpl implements CourseService {
                 .last(page.isLast())
                 .build();
     }
+
 
     @Override
     public CourseDto getById(String id) {

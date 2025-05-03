@@ -14,6 +14,6 @@ public class AuthLoginRequest {
     @NotNull(message = "Password is required")
     @Size(min = 4, message = "Password must be longer than 4 letters")
     public String password;
-    @NotNull(message = "Password is required")
+    @NotNull
     public Role role = Role.USER;
 }

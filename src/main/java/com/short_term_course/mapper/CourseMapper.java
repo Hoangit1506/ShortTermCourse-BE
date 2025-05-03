@@ -15,7 +15,7 @@ public interface CourseMapper {
     @Mapping(target="classes", ignore=true)
     @Mapping(target="thumbnail", source="dto.thumbnail")
     @Mapping(target="promoVideo", source="dto.promoVideo")
-    @Mapping(target="category", ignore=true) // set trong service
+    @Mapping(target="category", ignore=true)
     Course toEntity(CreateCourseRequest dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

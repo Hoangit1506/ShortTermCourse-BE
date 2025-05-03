@@ -26,7 +26,7 @@ public class CreateCourseRequest {
     String categoryId;
 
 //    @NotBlank(message = "Thumbnail URL is required")
-    String thumbnail;    // client sẽ gửi URL sau khi gọi upload
+    String thumbnail;
 
-    String promoVideo;   // có thể để null nếu chưa upload video
+    String promoVideo;   
 }

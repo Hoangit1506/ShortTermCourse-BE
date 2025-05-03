@@ -15,9 +15,19 @@ import com.short_term_course.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +36,63 @@ public class ClassroomServiceImpl implements ClassroomService {
     private final CourseRepository courseRepo;
     private final AccountRepository accountRepo;
     private final ClassroomMapper mapper;
+
+    @Override
+    public PagedResponse<ClassroomDto> listAdmin(String keyword, String categoryId, String courseId, String lecturerId, Pageable pageable) {
+        List<Classroom> all = classroomRepo.findAll();
+
+        Stream<Classroom> stream = all.stream();
+        if (keyword != null && !keyword.isBlank()) {
+            String kw = keyword.toLowerCase();
+            stream = stream.filter(c -> c.getName() != null
+                    && c.getName().toLowerCase().contains(kw));
+        }
+
+        if (categoryId != null && !categoryId.isBlank()) {
+            stream = stream.filter(c -> c.getCourse().getCategory().getId().equals(categoryId));
+        }
+
+        if (courseId != null && !courseId.isBlank()) {
+            stream = stream.filter(c -> c.getCourse().getId().equals(courseId));
+        }
+
+        if (lecturerId != null && !lecturerId.isBlank()) {
+            stream = stream.filter(c -> c.getLecturer().getId().equals(lecturerId));
+        }
+
+        List<Classroom> filtered = stream.collect(Collectors.toList());
+
+        LocalDate today = LocalDate.now();
+        filtered.sort(Comparator
+                .comparingLong((Classroom c) ->
+                        Math.abs(ChronoUnit.DAYS.between(today, c.getStartDate()))
+                )
+                .thenComparing(Classroom::getName)
+        );
+
+        int total = filtered.size();
+        int pageNum  = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int start    = pageNum * pageSize;
+        int end      = Math.min(start + pageSize, total);
+
+        List<Classroom> paged = (start <= end)
+                ? filtered.subList(start, end)
+                : List.of();
+
+        List<ClassroomDto> dtos = paged.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+
+        return PagedResponse.<ClassroomDto>builder()
+                .content(dtos)
+                .pageNumber(pageNum)
+                .pageSize(pageSize)
+                .totalElements((long) total)
+                .totalPages((int) Math.ceil((double) total / pageSize))
+                .last(end == total)
+                .build();
+    }
 
     @Override
     @Transactional
@@ -102,4 +169,26 @@ public class ClassroomServiceImpl implements ClassroomService {
                 .last(dtos.isLast())
                 .build();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PagedResponse<ClassroomDto> filterOpenCourses(String keyword, String courseId,
+                                                         String categoryId, String startDate, String endDate, Pageable pageable) {
+
+        LocalDate start = (startDate == null || startDate.isBlank()) ? null : LocalDate.parse(startDate);
+        LocalDate end   = (endDate   == null || endDate.isBlank())   ? null : LocalDate.parse(endDate);
+
+        String kw = (keyword == null || keyword.isBlank()) ? null : keyword.toLowerCase();
+
+        Page<Classroom> page = classroomRepo.filterOpenCourses(
+                kw, courseId, categoryId, start, end, pageable
+        );
+
+        List<ClassroomDto> dtoList = page.getContent().stream()
+                .map(mapper::toDto)
+                .toList();
+
+        return new PagedResponse<>(dtoList, pageable, page.getTotalElements());
+    }
+
 }

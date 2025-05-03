@@ -8,4 +8,5 @@ public interface CourseRepository extends JpaRepository<Course,String> {
     boolean existsByName(String name);
     Page<Course> findByCategoryId(String categoryId, Pageable pageable);
     Page<Course> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
+    Page<Course> findByNameContainingIgnoreCaseAndCategoryId(String keyword, String categoryId, Pageable pageable);
 }

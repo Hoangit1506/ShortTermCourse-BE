@@ -2,6 +2,8 @@ package com.short_term_course.dto.lecturer;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -12,10 +14,9 @@ import java.util.Set;
 public class UpdateLecturerRequest {
     String displayName;
     String phoneNumber;
+    LocalDate dob;
     String avatar;
-
     String degree;
     String position;
-
     Set<String> specializationIds;
 }

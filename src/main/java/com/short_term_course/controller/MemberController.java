@@ -2,17 +2,24 @@ package com.short_term_course.controller;
 
 import com.short_term_course.dto.api.ApiResponse;
 import com.short_term_course.dto.member.*;
+import com.short_term_course.dto.pagination.PagedResponse;
 import com.short_term_course.repository.ClassroomRepository;
 import com.short_term_course.service.ClassroomService;
 import com.short_term_course.service.MemberService;
 import com.short_term_course.util.jwt.BaseJWTUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -20,7 +27,6 @@ import java.util.List;
 public class MemberController {
     private final MemberService service;
 
-    // 1. Sinh viên xem lớp đã đăng ký
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/members")
     public ResponseEntity<ApiResponse<List<MemberDto>>> myEnrollments() {
@@ -29,7 +35,19 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.<List<MemberDto>>builder().data(list).build());
     }
 
-    // 2. Sinh viên enroll (USER)
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/members/my-courses")
+    public ResponseEntity<ApiResponse<PagedResponse<MemberDto>>> myCourses(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        String studentId = BaseJWTUtil.getPayload().getId();
+        var result = service.getMyCourses(studentId, keyword, pageable);
+        return ResponseEntity.ok(ApiResponse.<PagedResponse<MemberDto>>builder()
+                .data(result)
+                .build());
+    }
+
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/members")
     public ResponseEntity<ApiResponse<MemberDto>> enroll(
@@ -40,7 +58,17 @@ public class MemberController {
                 .body(ApiResponse.<MemberDto>builder().data(m).build());
     }
 
-    // 3. Sinh viên hủy đăng ký
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/members/check")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkRegistered(
+            @RequestParam String classroomId) {
+        String studentId = BaseJWTUtil.getPayload().getId();
+        boolean registered = service.isRegistered(studentId, classroomId);
+        return ResponseEntity.ok(ApiResponse.<Map<String, Boolean>>builder()
+                .data(Map.of("registered", registered))
+                .build());
+    }
+
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/members/delete/{classroomId}")
     public ResponseEntity<ApiResponse<Void>> cancel(
@@ -50,7 +78,6 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.<Void>builder().build());
     }
 
-    // 4. Lecturer/ADMIN xem danh sách sinh viên trong 1 lớp
     @PreAuthorize("hasAnyRole('LECTURER','ADMIN')")
     @GetMapping("/classrooms/{classroomId}/members")
     public ResponseEntity<ApiResponse<List<MemberDto>>> listByClassroom(
@@ -59,7 +86,6 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.<List<MemberDto>>builder().data(list).build());
     }
 
-    // 5. Lecturer/ADMIN chấm điểm, cập nhật status
     @PreAuthorize("hasAnyRole('LECTURER','ADMIN')")
     @PutMapping("/classrooms/{classroomId}/members/update/{studentId}")
     public ResponseEntity<ApiResponse<MemberDto>> updateMember(
@@ -70,7 +96,6 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.<MemberDto>builder().data(m).build());
     }
 
-    // 6. Lecturer/ADMIN remove 1 student
     @PreAuthorize("hasAnyRole('LECTURER','ADMIN')")
     @DeleteMapping("/classrooms/{classroomId}/members/delete/{studentId}")
     public ResponseEntity<ApiResponse<Void>> removeStudent(
@@ -79,4 +104,8 @@ public class MemberController {
         service.remove(classroomId, studentId);
         return ResponseEntity.ok(ApiResponse.<Void>builder().build());
     }
+
+
 }
+
+

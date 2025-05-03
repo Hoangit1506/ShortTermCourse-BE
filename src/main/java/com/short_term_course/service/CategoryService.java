@@ -10,9 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CategoryService {
-//    List<CategoryDto> getAll();
-//    Page<CategoryDto> getAll(Pageable pageable);
-    PagedResponse<CategoryDto> getAll(Pageable pageable);
+    PagedResponse<CategoryDto> getAll(String search, Pageable pageable);
     CategoryDto getById(String id);
     CategoryDto create(CreateCategoryRequest dto);
     CategoryDto update(String id, UpdateCategoryRequest dto);

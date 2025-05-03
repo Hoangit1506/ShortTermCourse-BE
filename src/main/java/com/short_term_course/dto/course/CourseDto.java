@@ -15,8 +15,8 @@ public class CourseDto {
     String suitable;
     Double price;
     String content;
-    String thumbnail;    // URL ảnh
-    String promoVideo;   // URL video
+    String thumbnail;
+    String promoVideo;   
     String categoryId;
     String categoryName;
 }

@@ -17,13 +17,12 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LecturerProfile {
-    // Khóa chính đồng thời là khóa ngoại tới accounts.acc_id
+
     @Id
     @Column(name = "acc_id")
     @JsonIgnore
     String accountId;
 
-    // Liên kết 1-1 với Account
     @OneToOne
     @MapsId
     @JoinColumn(name = "acc_id")
@@ -35,7 +34,6 @@ public class LecturerProfile {
     @Column(name = "degree")
     String degree;
 
-    // Giảng viên có thể chuyên về nhiều Category
     @ManyToMany
     @JoinTable(
             name = "lecturer_specializations",

@@ -31,13 +31,13 @@ public class Classroom {
     LocalDate endDate;
 
     @Column(name = "classroom_place")
-    String place;  // Địa điểm học
+    String place;
 
     @Column(name = "classroom_capacity")
-    int capacity;  // Số học viên tối đa
+    int capacity;
 
     @Column(name = "classroom_enrolled")
-    int enrolled; // Số học viên đã đăng ký
+    int enrolled;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
@@ -45,7 +45,7 @@ public class Classroom {
 
     @ManyToOne
     @JoinColumn(name = "lecturer_id", nullable = false)
-    Account lecturer; // Giảng viên phụ trách lớp
+    Account lecturer; 
 
     @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL)
     List<Member> members = new ArrayList<>();
